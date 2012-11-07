@@ -300,6 +300,10 @@ static NSString *keychainIdentifier = @"Keychain";
 	}
 }
 
+- (void)removeObjectForKey:(id)key {
+	[self.data removeObjectForKey:key];
+}
+
 
 #pragma mark - Raw Data Methods
 
