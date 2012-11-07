@@ -302,6 +302,8 @@ static NSString *keychainIdentifier = @"Keychain";
 
 - (void)removeObjectForKey:(id)key {
 	[self.data removeObjectForKey:key];
+	
+	[self storeData];
 }
 
 
