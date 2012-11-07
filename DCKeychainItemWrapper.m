@@ -76,7 +76,7 @@ static NSString *keychainIdentifier = @"Keychain";
 
 + (DCKeychainItemWrapper *)sharedWrapper {
 	static dispatch_once_t pred;
-	static KeychainItemWrapper *_sharedWrapper = nil;
+	static DCKeychainItemWrapper *_sharedWrapper = nil;
 	
 	dispatch_once(&pred, ^
 				  {
