@@ -35,16 +35,7 @@
  
  This wrapper is based on Apple's sample code, with methods added for easier use.
  */
-@interface DCKeychainItemWrapper : NSObject {
-    
-@private
-	NSMutableDictionary *data_;
-	NSNumberFormatter *numberFormatter_;
-	NSDateFormatter *dateFormatter_;
-	
-	NSMutableDictionary *keychainItemData_;		// The actual keychain item data backing store.
-	NSMutableDictionary *genericPasswordQuery_;	// A placeholder for the generic keychain item query used to locate the item.
-}
+@interface DCKeychainItemWrapper : NSObject
 
 + (DCKeychainItemWrapper *)sharedWrapper;
 

@@ -52,34 +52,25 @@
  
  */
 
+
 @interface DCKeychainItemWrapper ()
 
 @property (nonatomic, strong) NSMutableDictionary *data;
-@property (unsafe_unretained, readonly) NSNumberFormatter *numberFormatter;
-@property (unsafe_unretained, readonly) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSMutableDictionary *keychainItemData;
-@property (unsafe_unretained, readonly) NSMutableDictionary *genericPasswordQuery;
-
-- (void)storeData;
-- (void)readData;
-/*
- The decision behind the following two methods (secItemFormatToDictionary and dictionaryToSecItemFormat) was
- to encapsulate the transition between what the detail view controller was expecting (NSString *) and what the
- Keychain API expects as a validly constructed container class.
- */
-- (NSMutableDictionary *)secItemFormatToDictionary:(NSDictionary *)dictionaryToConvert;
-- (NSMutableDictionary *)dictionaryToSecItemFormat:(NSDictionary *)dictionaryToConvert;
-- (id)initWithIdentifier: (NSString *)identifier accessGroup:(NSString *) accessGroup;
-
-// Updates the item in the keychain, or adds it if it doesn't exist.
-- (void)writeToKeychain;
+@property (nonatomic, strong, readonly) NSNumberFormatter *numberFormatter;
+@property (nonatomic, strong, readonly) NSDateFormatter *dateFormatter;
+@property (nonatomic, strong, readonly) NSMutableDictionary *genericPasswordQuery;
 
 @end
 
+
 @implementation DCKeychainItemWrapper
 
-@synthesize data = data_;
-@synthesize keychainItemData = keychainItemData_;
+
+@synthesize numberFormatter = _numberFormatter;
+@synthesize dateFormatter = _dateFormatter;
+@synthesize genericPasswordQuery = _genericPasswordQuery;
+
 
 static NSString *keychainIdentifier = @"Keychain";
 
@@ -99,35 +90,35 @@ static NSString *keychainIdentifier = @"Keychain";
 #pragma mark - Properties
 
 - (NSDateFormatter *)dateFormatter {
-	if (dateFormatter_ != nil) {
-		return dateFormatter_;
+	if (_dateFormatter != nil) {
+		return _dateFormatter;
 	}
 	
-	dateFormatter_ = [[NSDateFormatter alloc] init];
-	[dateFormatter_ setDateStyle:NSDateFormatterFullStyle];
-	[dateFormatter_ setTimeStyle:NSDateFormatterFullStyle];
+	_dateFormatter = [[NSDateFormatter alloc] init];
+	[_dateFormatter setDateStyle:NSDateFormatterFullStyle];
+	[_dateFormatter setTimeStyle:NSDateFormatterFullStyle];
 	
-	return dateFormatter_;
+	return _dateFormatter;
 }
 
 - (NSNumberFormatter *)numberFormatter {
-	if (numberFormatter_ != nil) {
-		return numberFormatter_;
+	if (_numberFormatter != nil) {
+		return _numberFormatter;
 	}
 	
-	numberFormatter_ = [[NSNumberFormatter alloc] init];
+	_numberFormatter = [[NSNumberFormatter alloc] init];
 	
-	return numberFormatter_;
+	return _numberFormatter;
 }
 
 - (NSMutableDictionary *)genericPasswordQuery {
-	if (genericPasswordQuery_ != nil) {
-		return genericPasswordQuery_;
+	if (_genericPasswordQuery != nil) {
+		return _genericPasswordQuery;
 	}
 	
-	genericPasswordQuery_ = [[NSMutableDictionary alloc] init];
+	_genericPasswordQuery = [[NSMutableDictionary alloc] init];
 	
-	return genericPasswordQuery_;
+	return _genericPasswordQuery;
 }
 
 
@@ -222,6 +213,9 @@ static NSString *keychainIdentifier = @"Keychain";
 	return self;
 }
 
+
+#pragma mark - Key/Value Methods
+
 - (void)setBool:(BOOL)inBool forKey:(id)key {
 	NSNumber *inNumber = [NSNumber numberWithBool:inBool];
 	NSString *inString = [self.numberFormatter stringFromNumber:inNumber];
@@ -305,6 +299,22 @@ static NSString *keychainIdentifier = @"Keychain";
 		return nil;
 	}
 }
+
+
+#pragma mark - Raw Data Methods
+
+- (void)setKeychainData:(NSDictionary *)data {
+	self.data = [NSMutableDictionary dictionaryWithDictionary:data];
+	
+	[self storeData];
+}
+
+- (NSDictionary *)getKeychainData {
+	return [NSDictionary dictionaryWithDictionary:self.data];
+}
+
+
+#pragma mark - Private Methods
 
 - (void)storeData {
 	NSError *error = nil;
@@ -461,19 +471,6 @@ static NSString *keychainIdentifier = @"Keychain";
 		
 		NSAssert(result == noErr, @"Couldn't add the Keychain Item." );
     }
-}
-
-
-#pragma mark - Raw Data Methods
-
-- (void)setKeychainData:(NSDictionary *)data {
-	self.data = [NSMutableDictionary dictionaryWithDictionary:data];
-	
-	[self storeData];
-}
-
-- (NSDictionary *)getKeychainData {
-	return [NSDictionary dictionaryWithDictionary:self.data];
 }
 
 @end
