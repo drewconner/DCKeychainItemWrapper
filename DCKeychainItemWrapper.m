@@ -264,9 +264,13 @@ static NSString *keychainIdentifier = @"Keychain";
 - (NSArray *)arrayForKey:(id)key {
 	NSString *json = [self stringForKey:key];
 	
-	NSArray *array = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
-													 options:0
-													   error:nil];
+	NSArray *array = nil;
+	
+	if (json) {
+		array = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+												options:0
+												  error:nil];
+	}
 	
     return array;
 }
@@ -284,9 +288,13 @@ static NSString *keychainIdentifier = @"Keychain";
 - (NSDictionary *)dictionaryForKey:(id)key {
 	NSString *json = [self stringForKey:key];
 	
-	NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
-															   options:0
-																 error:nil];
+	NSDictionary *dictionary = nil;
+	
+	if (json) {
+		dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+													 options:0
+													   error:nil];
+	}
 	
     return dictionary;
 }
