@@ -243,7 +243,13 @@ static NSString *keychainIdentifier = @"Keychain";
 }
 
 - (NSString *)stringForKey:(id)key {
-	return [self.data objectForKey:key];
+	NSString *string = [self.data objectForKey:key];
+	
+	if (string && [string isKindOfClass:[NSString class]]) {
+		return string;
+	} else {
+		return nil;
+	}
 }
 
 - (void)setDate:(NSDate *)inDate forKey:(id)key {
@@ -272,7 +278,11 @@ static NSString *keychainIdentifier = @"Keychain";
 												  error:nil];
 	}
 	
-    return array;
+    if (array && [array isKindOfClass:[NSArray class]]) {
+		return array;
+	} else {
+		return nil;
+	}
 }
 
 - (void)setDictionary:(NSDictionary *)dictionary forKey:(id)key {
@@ -296,7 +306,11 @@ static NSString *keychainIdentifier = @"Keychain";
 													   error:nil];
 	}
 	
-    return dictionary;
+    if (dictionary && [dictionary isKindOfClass:[NSDictionary class]]) {
+		return dictionary;
+	} else {
+		return nil;
+	}
 }
 
 - (NSDate *)dateForKey:(id)key {
@@ -306,6 +320,10 @@ static NSString *keychainIdentifier = @"Keychain";
 	} else {
 		return nil;
 	}
+}
+
+- (id)objectForKey:(id)key {
+	return [self.data objectForKey:key];
 }
 
 - (void)removeObjectForKey:(id)key {

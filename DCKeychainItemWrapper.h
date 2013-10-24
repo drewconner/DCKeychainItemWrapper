@@ -54,6 +54,7 @@
 - (void)setDate:(NSDate *)inDate forKey:(id)key;
 - (NSDate *)dateForKey:(id)key;
 
+- (id)objectForKey:(id)key;
 - (void)removeObjectForKey:(id)aKey;
 
 // Methods for accessing raw data
