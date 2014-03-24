@@ -57,6 +57,7 @@
 
 @property (nonatomic, strong) NSMutableDictionary *data;
 @property (nonatomic, strong) NSMutableDictionary *keychainItemData;
+@property (nonatomic, strong) dispatch_queue_t keychainQueue;
 @property (nonatomic, strong, readonly) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong, readonly) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong, readonly) NSMutableDictionary *genericPasswordQuery;
@@ -129,6 +130,8 @@ static NSString *keychainIdentifier = @"Keychain";
 	
 	if (self) {
 		self.data = [[NSMutableDictionary alloc] init];
+		
+		self.keychainQueue = dispatch_queue_create("com.drewconner.keychainqueue", DISPATCH_QUEUE_SERIAL);
 		
         // Begin Keychain search setup. The genericPasswordQuery leverages the special user
         // defined attribute kSecAttrGeneric to distinguish itself between other generic Keychain
@@ -214,36 +217,24 @@ static NSString *keychainIdentifier = @"Keychain";
 }
 
 
-#pragma mark - Key/Value Methods
+#pragma mark - Read Methods
 
-- (void)setBool:(BOOL)inBool forKey:(id)key {
-	NSNumber *inNumber = [NSNumber numberWithBool:inBool];
-	NSString *inString = [self.numberFormatter stringFromNumber:inNumber];
-	[self setString:inString forKey:key];
-}
-
-- (BOOL)boolForKey:(id)key {
-	NSString *outString = [self stringForKey:key];
-	if (outString) {
-		NSNumber *outNumber = [self.numberFormatter numberFromString:outString];
-		return [outNumber boolValue];
-	} else {
-		return NO;
-	}
-}
-
-- (void)setString:(NSString *)inString forKey:(id)key {
-	if (inString) {
-		[self.data setObject:inString forKey:key];
-	} else {
-		[self.data removeObjectForKey:key];
-	}
+- (id)objectForKey:(id)key {
+	__block id object = nil;
 	
-	[self storeData];
+	dispatch_sync(self.keychainQueue, ^{
+		object = [self.data objectForKey:key];
+	});
+	
+	return object;
 }
 
 - (NSString *)stringForKey:(id)key {
-	NSString *string = [self.data objectForKey:key];
+	__block NSString *string = nil;
+	
+	dispatch_sync(self.keychainQueue, ^{
+		string = [self.data objectForKey:key];
+	});
 	
 	if (string && [string isKindOfClass:[NSString class]]) {
 		return string;
@@ -252,19 +243,15 @@ static NSString *keychainIdentifier = @"Keychain";
 	}
 }
 
-- (void)setDate:(NSDate *)inDate forKey:(id)key {
-	NSString *inString = [self.dateFormatter stringFromDate:inDate];
-	[self setString:inString forKey:key];
-}
-
-- (void)setArray:(NSArray *)array forKey:(id)key {
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array
-													   options:0
-														 error:nil];
+- (BOOL)boolForKey:(id)key {
+	NSString *outString = [self stringForKey:key];
 	
-	NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-	
-    [self setString:json forKey:key];
+	if (outString) {
+		NSNumber *outNumber = [self.numberFormatter numberFromString:outString];
+		return [outNumber boolValue];
+	} else {
+		return NO;
+	}
 }
 
 - (NSArray *)arrayForKey:(id)key {
@@ -283,16 +270,6 @@ static NSString *keychainIdentifier = @"Keychain";
 	} else {
 		return nil;
 	}
-}
-
-- (void)setDictionary:(NSDictionary *)dictionary forKey:(id)key {
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
-													   options:0
-														 error:nil];
-	
-	NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-	
-    [self setString:json forKey:key];
 }
 
 - (NSDictionary *)dictionaryForKey:(id)key {
@@ -322,14 +299,58 @@ static NSString *keychainIdentifier = @"Keychain";
 	}
 }
 
-- (id)objectForKey:(id)key {
-	return [self.data objectForKey:key];
+
+#pragma mark - Write Methods
+
+- (void)setString:(NSString *)inString forKey:(id)key {
+	dispatch_sync(self.keychainQueue, ^{
+		if (inString) {
+			[self.data setObject:inString forKey:key];
+		} else {
+			[self.data removeObjectForKey:key];
+		}
+		
+		[self storeData];
+	});
+}
+
+- (void)setBool:(BOOL)inBool forKey:(id)key {
+	NSNumber *inNumber = [NSNumber numberWithBool:inBool];
+	NSString *inString = [self.numberFormatter stringFromNumber:inNumber];
+	[self setString:inString forKey:key];
+}
+
+- (void)setDate:(NSDate *)inDate forKey:(id)key {
+	NSString *inString = [self.dateFormatter stringFromDate:inDate];
+	[self setString:inString forKey:key];
+}
+
+- (void)setArray:(NSArray *)array forKey:(id)key {
+	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array
+													   options:0
+														 error:nil];
+	
+	NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+	
+    [self setString:json forKey:key];
+}
+
+- (void)setDictionary:(NSDictionary *)dictionary forKey:(id)key {
+	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
+													   options:0
+														 error:nil];
+	
+	NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+	
+    [self setString:json forKey:key];
 }
 
 - (void)removeObjectForKey:(id)key {
-	[self.data removeObjectForKey:key];
-	
-	[self storeData];
+	dispatch_sync(self.keychainQueue, ^{
+		[self.data removeObjectForKey:key];
+		
+		[self storeData];
+	});
 }
 
 
@@ -383,30 +404,32 @@ static NSString *keychainIdentifier = @"Keychain";
 }
 
 - (void)resetKeychainItem {
-	OSStatus junk = noErr;
-	
-    if (!self.keychainItemData) {
-        self.keychainItemData = [[NSMutableDictionary alloc] init];
-    } else {
-        NSMutableDictionary *tempDictionary = [self dictionaryToSecItemFormat:self.keychainItemData];
-		junk = SecItemDelete((__bridge CFDictionaryRef)tempDictionary);
-        NSAssert( junk == noErr || junk == errSecItemNotFound, @"Problem deleting current dictionary." );
-    }
-    
-	// Default attributes for keychain item.
-	[self.keychainItemData setObject:keychainIdentifier forKey:(__bridge id)kSecAttrGeneric];
-	[self.keychainItemData setObject:keychainIdentifier forKey:(__bridge id)kSecAttrAccount];
-	[self.keychainItemData setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:(__bridge id)kSecAttrService];
-	
-    [self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrLabel];
-    [self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrDescription];
-    
-	// Default data for keychain item.
-    [self.keychainItemData setObject:@"" forKey:(__bridge id)kSecValueData];
-	
-	[self writeToKeychain];
-	
-	[self readData];
+	dispatch_sync(self.keychainQueue, ^{
+		OSStatus junk = noErr;
+		
+		if (!self.keychainItemData) {
+			self.keychainItemData = [[NSMutableDictionary alloc] init];
+		} else {
+			NSMutableDictionary *tempDictionary = [self dictionaryToSecItemFormat:self.keychainItemData];
+			junk = SecItemDelete((__bridge CFDictionaryRef)tempDictionary);
+			NSAssert( junk == noErr || junk == errSecItemNotFound, @"Problem deleting current dictionary." );
+		}
+		
+		// Default attributes for keychain item.
+		[self.keychainItemData setObject:keychainIdentifier forKey:(__bridge id)kSecAttrGeneric];
+		[self.keychainItemData setObject:keychainIdentifier forKey:(__bridge id)kSecAttrAccount];
+		[self.keychainItemData setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:(__bridge id)kSecAttrService];
+		
+		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrLabel];
+		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrDescription];
+		
+		// Default data for keychain item.
+		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecValueData];
+		
+		[self writeToKeychain];
+		
+		[self readData];
+	});
 }
 
 - (NSMutableDictionary *)dictionaryToSecItemFormat:(NSDictionary *)dictionaryToConvert {
