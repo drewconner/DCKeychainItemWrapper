@@ -37,6 +37,10 @@
  */
 @interface DCKeychainItemWrapper : NSObject
 
+// To use an Access Group, call this FIRST (before calling sharedWrapper)
++ (void)setAccessGroup:(NSString *)accessGroup;
+
+// Returns the shared wrapper object, once this is called, Access Group cannot be changed
 + (DCKeychainItemWrapper *)sharedWrapper;
 
 // Methods for key/values
