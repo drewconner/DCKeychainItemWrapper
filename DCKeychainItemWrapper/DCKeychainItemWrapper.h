@@ -43,6 +43,9 @@
 // Returns the shared wrapper object, once this is called, Access Group cannot be changed
 + (DCKeychainItemWrapper *)sharedWrapper;
 
+// Defaults to Bundle Identifier
+- (void)setService:(NSString *)service;
+
 // Methods for key/values
 - (void)setBool:(BOOL)inBool forKey:(id)key;
 - (BOOL)boolForKey:(id)key;
