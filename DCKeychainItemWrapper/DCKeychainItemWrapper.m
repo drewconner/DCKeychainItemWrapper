@@ -145,8 +145,6 @@ NSString *_accessGroup = nil;
 		self.identifier = identifier;
 		self.accessGroup = accessGroup;
 		self.service = [[NSBundle mainBundle] bundleIdentifier];
-		
-		[self initializeData];
     }
     
 	return self;
