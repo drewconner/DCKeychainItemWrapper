@@ -151,9 +151,11 @@ NSString *_accessGroup = nil;
 }
 
 - (void)setService:(NSString *)service {
-	_service = service;
-	
-	[self initializeData];
+	dispatch_sync(self.keychainQueue, ^{
+		_service = service;
+		
+		[self initializeData];
+	});
 }
 
 - (void)initializeData {
