@@ -37,6 +37,8 @@
  */
 @interface DCKeychainItemWrapper : NSObject
 
+@property (nonatomic, assign) BOOL debug;
+
 // To use an Access Group, call this FIRST (before calling sharedWrapper)
 + (void)setAccessGroup:(NSString *)accessGroup;
 
