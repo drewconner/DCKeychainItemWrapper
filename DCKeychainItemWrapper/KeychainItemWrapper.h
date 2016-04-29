@@ -6,7 +6,7 @@
 //  Copyright © 2016 Drew Conner. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for DCKeychainItemWrapper.
 FOUNDATION_EXPORT double DCKeychainItemWrapperVersionNumber;
