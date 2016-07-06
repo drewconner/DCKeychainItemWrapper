@@ -192,7 +192,7 @@ NSString *_service = nil;
 	
 	CFTypeRef localResult;
 	if (SecItemCopyMatching((__bridge CFDictionaryRef)tempQuery, &localResult) == noErr) {
-		NSDictionary *result = objc_retainedObject(localResult);
+		NSDictionary *result = (__bridge_transfer id)localResult;
 		
 		// load the saved data from Keychain.
 		self.keychainItemData = [self secItemFormatToDictionary:result];
@@ -485,7 +485,7 @@ NSString *_service = nil;
 	
 	CFTypeRef localResult;
 	if (SecItemCopyMatching((__bridge CFDictionaryRef)returnDictionary, &localResult) == noErr) {
-		NSData *passwordData = objc_retainedObject(localResult);
+		NSData *passwordData = (__bridge_transfer id)localResult;
 		
 		// Remove the search, class, and identifier key/value, we don't need them anymore.
 		[returnDictionary removeObjectForKey:(__bridge id)kSecReturnData];
@@ -511,7 +511,7 @@ NSString *_service = nil;
 	
 	CFTypeRef localResult;
 	if (SecItemCopyMatching((__bridge CFDictionaryRef)self.genericPasswordQuery, &localResult) == noErr) {
-		NSDictionary *attributes = objc_retainedObject(localResult);
+		NSDictionary *attributes = (__bridge_transfer id)localResult;
 		
 		// First we need the attributes from the Keychain.
 		NSMutableDictionary *updateItem = [NSMutableDictionary dictionaryWithDictionary:attributes];
