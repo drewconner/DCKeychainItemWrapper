@@ -216,7 +216,7 @@ NSString *_service = nil;
 		// Default attributes for keychain item.
 		[self.keychainItemData setObject:self.identifier forKey:(__bridge id)kSecAttrGeneric];
 		[self.keychainItemData setObject:self.identifier forKey:(__bridge id)kSecAttrAccount];
-		[self.keychainItemData setObject:[[NSBundle mainBundle] bundleIdentifier] forKey:(__bridge id)kSecAttrService];
+		[self.keychainItemData setObject:self.service forKey:(__bridge id)kSecAttrService];
 		
 		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrLabel];
 		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrDescription];
