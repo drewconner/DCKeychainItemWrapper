@@ -382,7 +382,7 @@ NSString *_service = nil;
 #pragma mark - Private Methods
 
 - (void)storeData {
-	if (self.debug) NSLog(@"<DCKeychainItemWrapper> Storing Data");
+	if (self.debug) NSLog(@"<DCKeychainItemWrapper> Storing Data to Keychain");
 	
 	NSError *error = nil;
 	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self.data
@@ -399,7 +399,7 @@ NSString *_service = nil;
 }
 
 - (void)readData {
-	if (self.debug) NSLog(@"<DCKeychainItemWrapper> Reading Data");
+	if (self.debug) NSLog(@"<DCKeychainItemWrapper> Reading Data from Keychain");
 	
 	NSError *error = nil;
 	NSString *jsonString = [self.keychainItemData objectForKey:(__bridge id)kSecValueData];
@@ -410,10 +410,12 @@ NSString *_service = nil;
 													  error:&error];
 		
 		if (self.data == nil) {
-			NSLog(@"Error Reading Keychain Data: %@", error);
+			NSLog(@"<DCKeychainItemWrapper> Error Reading Keychain Data: %@", error);
 			
 			self.data = [[NSMutableDictionary alloc] init];
-		}
+        } else {
+            if (self.debug) NSLog(@"<DCKeychainItemWrapper> Read Data: %@", self.data);
+        }
 	} else {
 		self.data = [[NSMutableDictionary alloc] init];
 	}
