@@ -192,6 +192,8 @@ NSString *_service = nil;
 	
 	CFTypeRef localResult;
 	if (SecItemCopyMatching((__bridge CFDictionaryRef)tempQuery, &localResult) == noErr) {
+        if (self.debug) NSLog(@"<DCKeychainItemWrapper> Matching Keychain Item Found, Fetching Data...");
+        
 		NSDictionary *result = (__bridge_transfer id)localResult;
 		
 		// load the saved data from Keychain.
@@ -199,6 +201,8 @@ NSString *_service = nil;
 		
 		[self readData];
 	} else {
+        if (self.debug) NSLog(@"<DCKeychainItemWrapper> No Matching Keychain Item Found, Initializing Data");
+        
 		// Stick these default values into keychain item if nothing found.
 		OSStatus junk = noErr;
 		if (!self.keychainItemData) {
