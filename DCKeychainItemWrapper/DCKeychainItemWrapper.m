@@ -64,7 +64,7 @@
 @property (nonatomic, strong) dispatch_queue_t keychainQueue;
 @property (nonatomic, strong, readonly) NSNumberFormatter *numberFormatter;
 @property (nonatomic, strong, readonly) NSDateFormatter *dateFormatter;
-@property (nonatomic, strong, readonly) NSMutableDictionary *genericPasswordQuery;
+@property (nonatomic, strong, readonly) NSDictionary *genericPasswordQuery;
 
 @end
 
@@ -125,16 +125,6 @@ NSString *_service = nil;
 	return _numberFormatter;
 }
 
-- (NSMutableDictionary *)genericPasswordQuery {
-	if (_genericPasswordQuery != nil) {
-		return _genericPasswordQuery;
-	}
-	
-	_genericPasswordQuery = [[NSMutableDictionary alloc] init];
-	
-	return _genericPasswordQuery;
-}
-
 - (void)setService:(NSString *)service {
 	if (self.debug) NSLog(@"<DCKeychainItemWrapper> Set Service: %@", service);
 	
@@ -162,6 +152,7 @@ NSString *_service = nil;
 		
 		self.identifier = identifier;
 		self.accessGroup = accessGroup;
+        
 		self.service = [[NSBundle mainBundle] bundleIdentifier];
 	}
 	
@@ -169,29 +160,34 @@ NSString *_service = nil;
 }
 
 - (void)initializeData {
+    NSMutableDictionary *mutableQuery = [[NSMutableDictionary alloc] init];
+    
 	// Begin Keychain search setup. The genericPasswordQuery leverages the special user
 	// defined attribute kSecAttrGeneric to distinguish itself between other generic Keychain
 	// items which may be included by the same application.
-	[self.genericPasswordQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+	[mutableQuery setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
 	
-	[self.genericPasswordQuery setObject:self.identifier forKey:(__bridge id)kSecAttrGeneric];
-	[self.genericPasswordQuery setObject:self.identifier forKey:(__bridge id)kSecAttrAccount];
-	[self.genericPasswordQuery setObject:self.service forKey:(__bridge id)kSecAttrService];
+	[mutableQuery setObject:self.identifier forKey:(__bridge id)kSecAttrGeneric];
+	[mutableQuery setObject:self.identifier forKey:(__bridge id)kSecAttrAccount];
+	[mutableQuery setObject:self.service forKey:(__bridge id)kSecAttrService];
 	
 	// The keychain access group attribute determines if this item can be shared
 	// amongst multiple apps whose code signing entitlements contain the same keychain access group.
 	if (self.accessGroup) {
-		[self.genericPasswordQuery setObject:self.accessGroup forKey:(__bridge id)kSecAttrAccessGroup];
+		[mutableQuery setObject:self.accessGroup forKey:(__bridge id)kSecAttrAccessGroup];
 	}
 	
 	// Use the proper search constants, return only the attributes of the first match.
-	[self.genericPasswordQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
-	[self.genericPasswordQuery setObject:(id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
+	[mutableQuery setObject:(__bridge id)kSecMatchLimitOne forKey:(__bridge id)kSecMatchLimit];
+	[mutableQuery setObject:(id)kCFBooleanTrue forKey:(__bridge id)kSecReturnAttributes];
 	
-	NSDictionary *tempQuery = [NSDictionary dictionaryWithDictionary:self.genericPasswordQuery];
+    // Save query to ready only property
+	_genericPasswordQuery = [NSDictionary dictionaryWithDictionary:mutableQuery];
+    
+    if (self.debug) NSLog(@"<DCKeychainItemWrapper> Searching for Keychain Items with Query: \n%@", self.genericPasswordQuery);
 	
 	CFTypeRef localResult;
-	if (SecItemCopyMatching((__bridge CFDictionaryRef)tempQuery, &localResult) == noErr) {
+	if (SecItemCopyMatching((__bridge CFDictionaryRef)self.genericPasswordQuery, &localResult) == noErr) {
 		NSDictionary *result = (__bridge_transfer id)localResult;
         
         if (self.debug) NSLog(@"<DCKeychainItemWrapper> Matching Keychain Item Found, Fetching Data with Query: \n%@", result);
@@ -217,9 +213,6 @@ NSString *_service = nil;
 		[self.keychainItemData setObject:self.identifier forKey:(__bridge id)kSecAttrGeneric];
 		[self.keychainItemData setObject:self.identifier forKey:(__bridge id)kSecAttrAccount];
 		[self.keychainItemData setObject:self.service forKey:(__bridge id)kSecAttrService];
-		
-		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrLabel];
-		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrDescription];
 		
 		// Default data for keychain item.
 		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecValueData];
@@ -444,9 +437,6 @@ NSString *_service = nil;
 		[self.keychainItemData setObject:self.identifier forKey:(__bridge id)kSecAttrAccount];
 		[self.keychainItemData setObject:self.service forKey:(__bridge id)kSecAttrService];
 		
-		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrLabel];
-		[self.keychainItemData setObject:@"" forKey:(__bridge id)kSecAttrDescription];
-		
 		if (self.accessGroup) {
 			[self.keychainItemData setObject:self.accessGroup forKey:(__bridge id)kSecAttrAccessGroup];
 		}
@@ -544,15 +534,14 @@ NSString *_service = nil;
 #endif
 		
 		// An implicit assumption is that you can only update a single item at a time.
-		
 		result = SecItemUpdate((__bridge CFDictionaryRef)updateItem, (__bridge CFDictionaryRef)tempCheck);
 		
-		NSAssert(result == noErr, @"Couldn't update the Keychain Item: %d", result );
+		NSAssert(result == noErr, @"Couldn't update the Keychain Item: %d", (int)result );
 	} else {
 		// No previous item found; add the new one.
 		result = SecItemAdd((__bridge CFDictionaryRef)[self dictionaryToSecItemFormat:self.keychainItemData], NULL);
 		
-		NSAssert(result == noErr, @"Couldn't add the Keychain Item: %d", result );
+		NSAssert(result == noErr, @"Couldn't add the Keychain Item: %d", (int)result );
 	}
 }
 
