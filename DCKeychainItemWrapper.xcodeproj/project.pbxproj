@@ -112,9 +112,9 @@
 			productReference = 3A8572B01CBFE0A1005FAA7E /* KeychainItemWrapper.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DC7285A01CE0FB7C00F2D8DB /* DCKeychainItemWrapper watchOS */ = {
+		DC7285A01CE0FB7C00F2D8DB /* KeychainItemWrapper watchOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DC7285A81CE0FB7C00F2D8DB /* Build configuration list for PBXNativeTarget "DCKeychainItemWrapper watchOS" */;
+			buildConfigurationList = DC7285A81CE0FB7C00F2D8DB /* Build configuration list for PBXNativeTarget "KeychainItemWrapper watchOS" */;
 			buildPhases = (
 				DC72859C1CE0FB7C00F2D8DB /* Sources */,
 				DC72859D1CE0FB7C00F2D8DB /* Frameworks */,
@@ -125,7 +125,7 @@
 			);
 			dependencies = (
 			);
-			name = "DCKeychainItemWrapper watchOS";
+			name = "KeychainItemWrapper watchOS";
 			productName = "DCKeychainItemWrapper watchOS";
 			productReference = DC7285A11CE0FB7C00F2D8DB /* KeychainItemWrapper.framework */;
 			productType = "com.apple.product-type.framework";
@@ -160,7 +160,7 @@
 			projectRoot = "";
 			targets = (
 				3A8572AF1CBFE0A1005FAA7E /* KeychainItemWrapper */,
-				DC7285A01CE0FB7C00F2D8DB /* DCKeychainItemWrapper watchOS */,
+				DC7285A01CE0FB7C00F2D8DB /* KeychainItemWrapper watchOS */,
 			);
 		};
 /* End PBXProject section */
@@ -337,7 +337,7 @@
 				INFOPLIST_FILE = DCKeychainItemWrapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.mailchimp.DCKeychainItemWrapper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drewconner.DCKeychainItemWrapper;
 				PRODUCT_NAME = KeychainItemWrapper;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -357,7 +357,7 @@
 				INFOPLIST_FILE = DCKeychainItemWrapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.mailchimp.DCKeychainItemWrapper;
+				PRODUCT_BUNDLE_IDENTIFIER = com.drewconner.DCKeychainItemWrapper;
 				PRODUCT_NAME = KeychainItemWrapper;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -387,13 +387,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DC7285A81CE0FB7C00F2D8DB /* Build configuration list for PBXNativeTarget "DCKeychainItemWrapper watchOS" */ = {
+		DC7285A81CE0FB7C00F2D8DB /* Build configuration list for PBXNativeTarget "KeychainItemWrapper watchOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DC7285A61CE0FB7C00F2D8DB /* Debug */,
 				DC7285A71CE0FB7C00F2D8DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

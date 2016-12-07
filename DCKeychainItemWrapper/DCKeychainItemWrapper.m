@@ -192,9 +192,9 @@ NSString *_service = nil;
 	
 	CFTypeRef localResult;
 	if (SecItemCopyMatching((__bridge CFDictionaryRef)tempQuery, &localResult) == noErr) {
-        if (self.debug) NSLog(@"<DCKeychainItemWrapper> Matching Keychain Item Found, Fetching Data...");
-        
 		NSDictionary *result = (__bridge_transfer id)localResult;
+        
+        if (self.debug) NSLog(@"<DCKeychainItemWrapper> Matching Keychain Item Found, Fetching Data with Query: \n%@", result);
 		
 		// load the saved data from Keychain.
 		self.keychainItemData = [self secItemFormatToDictionary:result];

@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DC7285A01CE0FB7C00F2D8DB"
                BuildableName = "KeychainItemWrapper.framework"
-               BlueprintName = "DCKeychainItemWrapper watchOS"
+               BlueprintName = "KeychainItemWrapper watchOS"
                ReferencedContainer = "container:DCKeychainItemWrapper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,7 +47,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DC7285A01CE0FB7C00F2D8DB"
             BuildableName = "KeychainItemWrapper.framework"
-            BlueprintName = "DCKeychainItemWrapper watchOS"
+            BlueprintName = "KeychainItemWrapper watchOS"
             ReferencedContainer = "container:DCKeychainItemWrapper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,7 +65,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DC7285A01CE0FB7C00F2D8DB"
             BuildableName = "KeychainItemWrapper.framework"
-            BlueprintName = "DCKeychainItemWrapper watchOS"
+            BlueprintName = "KeychainItemWrapper watchOS"
             ReferencedContainer = "container:DCKeychainItemWrapper.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
