@@ -78,8 +78,7 @@
 
 
 static NSString *_keychainIdentifier = @"Keychain";
-NSString *_accessGroup = nil;
-NSString *_service = nil;
+static NSString *_accessGroup = nil;
 
 
 #pragma mark - Properties
@@ -133,10 +132,6 @@ NSString *_service = nil;
 		
 		[self initializeData];
 	});
-}
-
-- (NSString *)service {
-	return _service;
 }
 
 
