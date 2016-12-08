@@ -73,4 +73,7 @@
 // Initializes and resets the default generic keychain item data.
 - (void)resetKeychainItem;
 
+// Deletes the corresponding keychian item
+- (void)deleteKeychainItem;
+
 @end

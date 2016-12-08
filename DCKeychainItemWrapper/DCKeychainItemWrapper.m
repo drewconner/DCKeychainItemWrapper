@@ -445,6 +445,17 @@ static NSString *_accessGroup = nil;
 	});
 }
 
+- (void)deleteKeychainItem {
+    dispatch_sync(self.keychainQueue, ^{
+        if (self.keychainItemData) {
+            OSStatus junk = noErr;
+            NSMutableDictionary *tempDictionary = [self dictionaryToSecItemFormat:self.keychainItemData];
+            junk = SecItemDelete((__bridge CFDictionaryRef)tempDictionary);
+            NSAssert( junk == noErr || junk == errSecItemNotFound, @"Problem deleting current dictionary." );
+        }
+    });
+}
+
 - (NSMutableDictionary *)dictionaryToSecItemFormat:(NSDictionary *)dictionaryToConvert {
 	// The assumption is that this method will be called with a properly populated dictionary
 	// containing all the right key/value pairs for a SecItem.
